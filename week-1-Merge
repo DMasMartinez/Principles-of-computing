@@ -1,0 +1,47 @@
+"""
+Merge function for 2048 game.
+"""
+
+def merge1(line):
+    """
+    This is a docstring for a function
+    Function that slide toward to left all values in a row.
+    """
+    # Here we create list of 0 with the same size as the input list 
+    zero_row=[0 for i in range(len(line))]
+    list_slide=[]
+    for idx in range(len(line)):
+        if line[idx]!=0:
+            list_slide.append(line[idx])
+    # Here we change the value of zero_row for the value with the same index in list_slide
+    for idx in range(len(zero_row)):
+        for i in range(len(list_slide)):
+            if idx==i:
+                zero_row[idx]=list_slide[i]
+                
+    return zero_row
+
+        
+def merge(line):
+    """
+    This is a docstring for a function
+    Function that merges a single row or column in 2048.
+    """
+    new_list = merge1(line)
+    counter=0
+    # while loop that iterate over a variable that iterate from index 1 and len(new_list)-1
+    while counter<=len(new_list)-2:
+        counter+=1
+        
+        for idx in range(counter,len(new_list)):
+            value_compare=new_list[counter-1]
+            if value_compare==new_list[idx]:
+                new_list[counter-1]*=2
+                new_list[counter]=0
+                counter+=1
+                break
+            else:
+                counter+=1
+    listo_show = merge1(new_list)
+    return listo_show
+

@@ -1,0 +1,224 @@
+"""
+Clone of 2048 game.
+"""
+
+import poc_2048_gui
+import user52_roQzBO5eeB_9 as merge
+import random
+import poc_simpletest
+
+
+# Directions, DO NOT MODIFY
+UP = 1
+DOWN = 2
+LEFT = 3
+RIGHT = 4
+
+# Offsets for computing tile indices in each direction.
+# DO NOT MODIFY this dictionary.
+OFFSETS = {UP: (1, 0),
+           DOWN: (-1, 0),
+           LEFT: (0, 1),
+           RIGHT: (0, -1)}
+
+def merge1(line):
+    """
+    This is a docstring for a function
+    Function that slide toward to left all values in a row.
+    """
+    # Here we create list of 0 with the same size as the input list 
+    zero_row=[0 for i in range(len(line))]
+    list_slide=[]
+    for idx in range(len(line)):
+        if line[idx]!=0:
+            list_slide.append(line[idx])
+    # Here we change the value of zero_row for the value with the same index in list_slide
+    for idx in range(len(zero_row)):
+        for i in range(len(list_slide)):
+            if idx==i:
+                zero_row[idx]=list_slide[i]
+                
+    return zero_row
+
+        
+def merge(line):
+    """
+    This is a docstring for a function
+    Function that merges a single row or column in 2048.
+    """
+    new_list = merge1(line)
+    counter=0
+    # while loop that iterate over a variable that iterate from index 1 and len(new_list)-1
+    while counter<=len(new_list)-2:
+        counter+=1
+        
+        for idx in range(counter,len(new_list)):
+            value_compare=new_list[counter-1]
+            if value_compare==new_list[idx]:
+                new_list[counter-1]*=2
+                new_list[counter]=0
+                counter+=1
+                break
+            else:
+                counter+=1
+    listo_show = merge1(new_list)
+    return listo_show
+
+def move_index(base_grid,initial,direction,rango):
+    """
+        here we use the initial tiles to create new rows and then merge each row
+        to yields an output as a new list.
+    """
+    total_list=[]
+    for val in initial[direction]:
+        index_list=[]
+
+        for idx in range(rango):
+            index_list.append([val[0]+OFFSETS[direction][0]*idx,val[1]+OFFSETS[direction][1]*idx])
+        total_list.append([base_grid[val[0]][val[1]] for val in index_list])
+        total_list[-1]=merge(total_list[-1])
+    return total_list
+def retrieve_form(base_grid,initial,direction,rango):
+    """
+        since we have taken values from the original grid and modify the rows, in this function
+        we fix this situation and return the grid how that used to be.
+    """
+    total_list=[]
+    if direction==UP:
+        for val in initial[direction]:
+            index_list=[]
+
+            for idx in range(rango):
+                index_list.append([val[0]+OFFSETS[direction][0]*idx,val[1]+OFFSETS[direction][1]*idx])
+            total_list.append([base_grid[val[0]][val[1]] for val in index_list])
+    if direction==DOWN:
+        for val in range(len(initial[direction])-1,-1,-1):
+            index_list=[]
+
+            for idx in range(rango-1,-1,-1):
+                index_list.append([initial[direction][val][0]+OFFSETS[direction][0]*idx,initial[direction][val][1]+OFFSETS[direction][1]*idx])
+            total_list.append([base_grid[val[0]][val[1]] for val in index_list])
+    if direction==LEFT:
+        for val in initial[direction]:
+            index_list=[]
+
+            for idx in range(rango):
+                index_list.append([val[0]+OFFSETS[direction][0]*idx,val[1]+OFFSETS[direction][1]*idx])
+            total_list.append([base_grid[val[0]][val[1]] for val in index_list])
+    if direction==RIGHT:
+        for val in initial[direction]:
+            index_list=[]
+
+            for idx in range(rango):
+                index_list.append([val[0]+OFFSETS[direction][0]*idx,val[1]+OFFSETS[direction][1]*idx])
+            total_list.append([base_grid[val[0]][val[1]] for val in index_list])
+    return total_list
+
+class TwentyFortyEight:
+    """
+    Class to run the game logic.
+    """
+    
+
+
+    def __init__(self, grid_height, grid_width):
+        self._height = grid_height
+        self._width = grid_width
+        self.initial_tiles = {DOWN:[[self._height-1,a] for a in range(self._width)]
+                 ,UP:[[0,a] for a in range(self._height)]
+                ,RIGHT:[[a,self._height-1] for a in range(self._width)]
+                ,LEFT:[[a,0] for a in range(self._width)]}
+        self.reset()
+
+    def reset(self):
+        """
+        Reset the game so the grid is empty except for two
+        initial tiles.
+        """
+        self._grid = [[0 for row in range(self._height)]
+                            for col in range(self._width)]
+        self.new_tile()
+        self.new_tile()
+
+    def __str__(self):
+        """
+        Return a string representation of the grid for debugging.
+        """
+        grid_result=""
+        for row in range(self._height):
+            grid_result+=str(self._grid[row])
+        return grid_result
+
+    def get_grid_height(self):
+        """
+        Get the height of the board.
+        """
+        return self._height
+
+    def get_grid_width(self):
+        """
+        Get the width of the board.
+        """
+        return self._width
+
+    def move(self, direction):
+        """
+        Move all tiles in the given direction and add
+        a new tile if any tiles moved.
+        """
+        current_grid=self._grid
+        if direction==UP:
+            temp_list=move_index(self._grid,self.initial_tiles,UP,self._height)
+            tile_show = retrieve_form(temp_list,self.initial_tiles,UP,self._width)
+            self._grid=tile_show
+            if self._grid==tile_show:
+                self.new_tile()
+        elif direction==DOWN:
+            temp_list=move_index(self._grid,self.initial_tiles,DOWN,self._height)
+            tile_show = retrieve_form(temp_list,self.initial_tiles,DOWN,self._width)
+            self._grid=tile_show
+            if self._grid==tile_show:
+                self.new_tile()
+        elif direction==LEFT:
+            temp_list=move_index(self._grid,self.initial_tiles,LEFT,self._width)
+            tile_show = retrieve_form(temp_list,self.initial_tiles,LEFT,self._height)
+            self._grid=tile_show
+            if self._grid==tile_show:
+                self.new_tile()
+        elif direction==RIGHT:
+            temp_list=move_index(self._grid,self.initial_tiles,RIGHT,self._width)
+            tile_show = retrieve_form(temp_list,self.initial_tiles,RIGHT,self._height)
+            self._grid=tile_show
+            if self._grid==tile_show:
+                self.new_tile()
+    def new_tile(self):
+        """
+        Create a new tile in a randomly selected empty
+        square.  The tile should be 2 90% of the time and
+        4 10% of the time.
+        """
+        tiles = [2,2,2,2,2,2,2,2,2,4]
+        tile_choose = random.choice(tiles)
+        random_row = random.randrange(0,self._height)
+        random_col = random.randrange(0,self._width)
+        if self._grid[random_row][random_col]==0:
+            self._grid[random_row][random_col]=tile_choose
+
+                
+
+    def set_tile(self, row, col, value):
+        """
+        Set the tile at position row, col to have the given value.
+        """
+        # replace with your code
+        self._grid[row][col]=value
+
+    def get_tile(self, row, col):
+        """
+        Return the value of the tile at position row, col.
+        """
+        # replace with your code
+        return self._grid[row][col]
+
+poc_2048_gui.run_gui(TwentyFortyEight(4,4))
+
